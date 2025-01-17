@@ -25,7 +25,7 @@ func (r *SQLCUserRepository) Create(ctx context.Context, user *models.User) erro
 	if err != nil {
 		return err
 	}
-	user.ID = createdUser.ID.String()
+	user.ID = createdUser.ID
 	user.CreatedAt = createdUser.CreatedAt.Time.String()
 	user.UpdatedAt = createdUser.UpdatedAt.Time.String()
 

@@ -7,8 +7,6 @@ package sqlc
 
 import (
 	"context"
-
-	"github.com/google/uuid"
 )
 
 const createPost = `-- name: CreatePost :one
@@ -17,9 +15,9 @@ INSERT INTO posts(title,content,user_id)
 `
 
 type CreatePostParams struct {
-	Title   string    `json:"title"`
-	Content string    `json:"content"`
-	UserID  uuid.UUID `json:"user_id"`
+	Title   string `json:"title"`
+	Content string `json:"content"`
+	UserID  string `json:"user_id"`
 }
 
 func (q *Queries) CreatePost(ctx context.Context, arg *CreatePostParams) (*Post, error) {
@@ -36,12 +34,12 @@ func (q *Queries) CreatePost(ctx context.Context, arg *CreatePostParams) (*Post,
 	return &i, err
 }
 
-const getByID = `-- name: GetByID :one
+const getPostByID = `-- name: GetPostByID :one
 SELECT id, title, content, user_id, created_at, updated_at FROM posts WHERE ID=$1
 `
 
-func (q *Queries) GetByID(ctx context.Context, id int64) (*Post, error) {
-	row := q.db.QueryRowContext(ctx, getByID, id)
+func (q *Queries) GetPostByID(ctx context.Context, id int64) (*Post, error) {
+	row := q.db.QueryRowContext(ctx, getPostByID, id)
 	var i Post
 	err := row.Scan(
 		&i.ID,

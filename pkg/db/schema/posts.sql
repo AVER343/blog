@@ -3,7 +3,7 @@ CREATE TABLE
         id BIGSERIAL PRIMARY KEY,
         title VARCHAR(255) NOT NULL,
         content TEXT NOT NULL,
-        user_id UUID NOT NULL,
+        user_id VARCHAR(127) NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE

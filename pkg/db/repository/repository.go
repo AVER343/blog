@@ -14,7 +14,7 @@ type UserRepository interface {
 }
 type PostRepository interface {
 	Create(ctx context.Context, post *models.Post) error
-	GetByID(ctx context.Context, ID int64) (*models.Post, error)
+	GetPostByID(ctx context.Context, ID int64) (*models.Post, error)
 }
 
 type Repository struct {

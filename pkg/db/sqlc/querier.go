@@ -11,7 +11,8 @@ import (
 type Querier interface {
 	CreatePost(ctx context.Context, arg *CreatePostParams) (*Post, error)
 	CreateUser(ctx context.Context, arg *CreateUserParams) (*User, error)
-	GetByID(ctx context.Context, id int64) (*Post, error)
+	GetPostByID(ctx context.Context, id int64) (*Post, error)
+	GetUserByID(ctx context.Context, id int64) (*Post, error)
 }
 
 var _ Querier = (*Queries)(nil)

@@ -33,3 +33,21 @@ func (q *Queries) CreateUser(ctx context.Context, arg *CreateUserParams) (*User,
 	)
 	return &i, err
 }
+
+const getUserByID = `-- name: GetUserByID :one
+SELECT id, title, content, user_id, created_at, updated_at FROM posts WHERE ID=$1
+`
+
+func (q *Queries) GetUserByID(ctx context.Context, id int64) (*Post, error) {
+	row := q.db.QueryRowContext(ctx, getUserByID, id)
+	var i Post
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Content,
+		&i.UserID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return &i, err
+}

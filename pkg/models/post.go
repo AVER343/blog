@@ -12,7 +12,7 @@ type Post struct {
 	Tags      []string `json:"tags"`
 }
 
-func NewPost(content, title, userID string, tags []string) Post {
+func NewPost(ID int64, content, title, userID string, tags []string) Post {
 	return Post{
 		Content:   content,
 		Title:     title,
@@ -20,5 +20,6 @@ func NewPost(content, title, userID string, tags []string) Post {
 		CreatedAt: time.Now().Format(time.RFC3339),
 		UpdatedAt: time.Now().Format(time.RFC3339),
 		Tags:      tags,
+		ID:        ID,
 	}
 }
