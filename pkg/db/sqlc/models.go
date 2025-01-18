@@ -15,6 +15,7 @@ type Post struct {
 	UserID    string       `json:"user_id"`
 	CreatedAt sql.NullTime `json:"created_at"`
 	UpdatedAt sql.NullTime `json:"updated_at"`
+	Tags      []string     `json:"tags"`
 }
 
 type User struct {

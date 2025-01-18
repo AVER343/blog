@@ -8,11 +8,11 @@ import (
 )
 
 type SQLCUserRepository struct {
-	queries *sqlc.Queries
+	query *sqlc.Queries
 }
 
 func NewSQLCUserRepository(queries *sqlc.Queries) *SQLCUserRepository {
-	return &SQLCUserRepository{queries: queries}
+	return &SQLCUserRepository{query: queries}
 }
 
 func (r *SQLCUserRepository) Create(ctx context.Context, user *models.User) error {
@@ -21,7 +21,7 @@ func (r *SQLCUserRepository) Create(ctx context.Context, user *models.User) erro
 		Username: user.Username,
 		Password: user.Password,
 	}
-	createdUser, err := r.queries.CreateUser(ctx, params)
+	createdUser, err := r.query.CreateUser(ctx, params)
 	if err != nil {
 		return err
 	}
@@ -30,4 +30,26 @@ func (r *SQLCUserRepository) Create(ctx context.Context, user *models.User) erro
 	user.UpdatedAt = createdUser.UpdatedAt.Time.String()
 
 	return nil
+}
+
+func (r *SQLCUserRepository) GetAllUsers(ctx context.Context) ([]*models.User, error) {
+	var users []*models.User = make([]*models.User, 0)
+	dbUserData, err := r.query.GetAllUsers(ctx, 2)
+	if err != nil {
+		return nil, err
+	}
+	for _, elem := range dbUserData {
+		user := models.NewUser(elem.ID, elem.Username, elem.Password, elem.Email)
+		users = append(users, user)
+	}
+	return users, nil
+}
+
+func (r *SQLCUserRepository) GetUserByID(ctx context.Context, id string) (*models.User, error) {
+	user, err := r.query.GetUserByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	modelUser := models.NewUser(user.ID, user.Username, user.Password, user.Email)
+	return modelUser, nil
 }

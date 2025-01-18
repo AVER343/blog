@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	ErrNotFound = errors.New("The requested data is not present")
+	ErrNotFound = errors.New("the requested data is not present")
 )
 
 type SQLCPostRepository struct {
@@ -51,7 +51,7 @@ func (p *SQLCPostRepository) GetPostByID(ctx context.Context, id int64) (*models
 	}
 	fmt.Print(post)
 	modelPost := models.NewPost(post.ID, post.Content, post.Title, post.UserID, nil)
-	return &modelPost, nil
+	return modelPost, nil
 }
 
 func (p *SQLCPostRepository) PatchByID(ctx context.Context, id int64) (*models.Post, error) {
@@ -62,5 +62,18 @@ func (p *SQLCPostRepository) PatchByID(ctx context.Context, id int64) (*models.P
 	}
 	fmt.Print(post)
 	modelPost := models.NewPost(post.ID, post.Content, post.Title, post.UserID, nil)
-	return &modelPost, nil
+	return modelPost, nil
+}
+
+func (p *SQLCPostRepository) GetAllPosts(ctx context.Context) ([]*models.Post, error) {
+	var posts []*models.Post = make([]*models.Post, 0)
+	dbPosts, err := p.query.GetAllPosts(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+	for _, elem := range dbPosts {
+		post := models.NewPost(elem.ID, elem.Content, elem.Title, elem.UserID, elem.Tags)
+		posts = append(posts, post)
+	}
+	return posts, nil
 }

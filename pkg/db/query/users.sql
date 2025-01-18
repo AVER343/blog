@@ -3,4 +3,7 @@ INSERT INTO users(email,username,password)
   VALUES ($1,$2,$3) RETURNING *;
 
 -- name: GetUserByID :one
-SELECT * FROM posts WHERE ID=$1;
+SELECT * FROM users WHERE ID=$1;
+
+-- name: GetAllUsers :many
+SELECT * FROM users LIMIT COALESCE($1,10);

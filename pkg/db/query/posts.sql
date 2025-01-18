@@ -4,3 +4,6 @@ INSERT INTO posts(title,content,user_id)
 
 -- name: GetPostByID :one
 SELECT * FROM posts WHERE ID=$1;
+
+-- name: GetAllPosts :many
+SELECT * FROM posts LIMIT COALESCE($1,10);

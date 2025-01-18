@@ -34,18 +34,52 @@ func (q *Queries) CreateUser(ctx context.Context, arg *CreateUserParams) (*User,
 	return &i, err
 }
 
-const getUserByID = `-- name: GetUserByID :one
-SELECT id, title, content, user_id, created_at, updated_at FROM posts WHERE ID=$1
+const getAllUsers = `-- name: GetAllUsers :many
+SELECT id, username, password, email, created_at, updated_at FROM users LIMIT COALESCE($1,10)
 `
 
-func (q *Queries) GetUserByID(ctx context.Context, id int64) (*Post, error) {
+func (q *Queries) GetAllUsers(ctx context.Context, dollar_1 interface{}) ([]*User, error) {
+	rows, err := q.db.QueryContext(ctx, getAllUsers, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*User
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.Username,
+			&i.Password,
+			&i.Email,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getUserByID = `-- name: GetUserByID :one
+SELECT id, username, password, email, created_at, updated_at FROM users WHERE ID=$1
+`
+
+func (q *Queries) GetUserByID(ctx context.Context, id string) (*User, error) {
 	row := q.db.QueryRowContext(ctx, getUserByID, id)
-	var i Post
+	var i User
 	err := row.Scan(
 		&i.ID,
-		&i.Title,
-		&i.Content,
-		&i.UserID,
+		&i.Username,
+		&i.Password,
+		&i.Email,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

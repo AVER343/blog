@@ -11,10 +11,13 @@ import (
 
 type UserRepository interface {
 	Create(ctx context.Context, user *models.User) error
+	GetUserByID(ctx context.Context, ID string) (*models.User, error)
+	GetAllUsers(ctx context.Context) ([]*models.User, error)
 }
 type PostRepository interface {
 	Create(ctx context.Context, post *models.Post) error
 	GetPostByID(ctx context.Context, ID int64) (*models.Post, error)
+	GetAllPosts(ctx context.Context) ([]*models.Post, error)
 }
 
 type Repository struct {

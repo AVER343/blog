@@ -7,11 +7,13 @@ package sqlc
 
 import (
 	"context"
+
+	"github.com/lib/pq"
 )
 
 const createPost = `-- name: CreatePost :one
 INSERT INTO posts(title,content,user_id)
-  VALUES ($1,$2,$3) RETURNING id, title, content, user_id, created_at, updated_at
+  VALUES ($1,$2,$3) RETURNING id, title, content, user_id, created_at, updated_at, tags
 `
 
 type CreatePostParams struct {
@@ -30,12 +32,48 @@ func (q *Queries) CreatePost(ctx context.Context, arg *CreatePostParams) (*Post,
 		&i.UserID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		pq.Array(&i.Tags),
 	)
 	return &i, err
 }
 
+const getAllPosts = `-- name: GetAllPosts :many
+SELECT id, title, content, user_id, created_at, updated_at, tags FROM posts LIMIT COALESCE($1,10)
+`
+
+func (q *Queries) GetAllPosts(ctx context.Context, dollar_1 interface{}) ([]*Post, error) {
+	rows, err := q.db.QueryContext(ctx, getAllPosts, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*Post
+	for rows.Next() {
+		var i Post
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Content,
+			&i.UserID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			pq.Array(&i.Tags),
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getPostByID = `-- name: GetPostByID :one
-SELECT id, title, content, user_id, created_at, updated_at FROM posts WHERE ID=$1
+SELECT id, title, content, user_id, created_at, updated_at, tags FROM posts WHERE ID=$1
 `
 
 func (q *Queries) GetPostByID(ctx context.Context, id int64) (*Post, error) {
@@ -48,6 +86,7 @@ func (q *Queries) GetPostByID(ctx context.Context, id int64) (*Post, error) {
 		&i.UserID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		pq.Array(&i.Tags),
 	)
 	return &i, err
 }

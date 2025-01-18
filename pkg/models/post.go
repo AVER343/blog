@@ -12,8 +12,8 @@ type Post struct {
 	Tags      []string `json:"tags"`
 }
 
-func NewPost(ID int64, content, title, userID string, tags []string) Post {
-	return Post{
+func NewPost(ID int64, content, title, userID string, tags []string) *Post {
+	return &Post{
 		Content:   content,
 		Title:     title,
 		UserID:    userID,
