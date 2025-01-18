@@ -9,8 +9,8 @@ import (
 
 func (app *application) internalServerError(w http.ResponseWriter, r *http.Request, err error) {
 	log.Printf("Internal Server Error - %s", r.Method)
-	log.Println("Path - %s", r.URL.Path)
-	log.Println("Err - %s", err)
+	log.Printf("Path - %s", r.URL.Path)
+	log.Printf("Err - %s", err)
 	utils.WriteJSONError(w, http.StatusInternalServerError, "Internal Server Error , we are working to fix !")
 }
 
