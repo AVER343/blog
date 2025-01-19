@@ -8,6 +8,7 @@ import (
 	"github.com/aver343/blog/pkg/db/repository"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/rs/cors"
 	"go.uber.org/zap"
 )
 
@@ -43,6 +44,7 @@ func (app *application) Mount() http.Handler {
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+	r.Use(cors.Default().Handler)
 	r.Route("/v1", func(r chi.Router) {
 		r.Route("/posts", postHandler(app))
 		r.Route("/users", userHandler(app))
