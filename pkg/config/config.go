@@ -3,9 +3,6 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"log"
-
-	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -14,11 +11,6 @@ type Config struct {
 }
 
 func SetupConfig() (*Config, error) {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-		return nil, err
-	}
 	var data = &Config{
 		Addr: GetString("ADDR", ":8080"),
 		DbConfig: &dbConfig{

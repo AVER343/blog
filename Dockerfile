@@ -24,6 +24,8 @@ RUN go mod download
 # Copy the entire application code
 COPY . .
 
+# Copy the .env file into the container
+COPY .env .env
 # Change directory to the location of the `main` package before building
 WORKDIR /app/cmd/api
 
