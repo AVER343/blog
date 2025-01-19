@@ -24,11 +24,14 @@ RUN go mod download
 # Copy the entire application code
 COPY . .
 
-# Build the application
-RUN go build -o app ./main.go
+# Change directory to the location of the `main` package before building
+WORKDIR /app/cmd/api
 
-# Expose the application's port (update according to your app's port)
+# Build the application
+RUN go build -o /app/app .
+
+# Expose the application's port
 EXPOSE 8080
 
 # Command to run the application
-CMD ["./app"]
+CMD ["/app/app"]
