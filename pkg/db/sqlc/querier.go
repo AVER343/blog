@@ -14,6 +14,7 @@ type Querier interface {
 	GetAllPosts(ctx context.Context, dollar_1 interface{}) ([]*Post, error)
 	GetAllUsers(ctx context.Context, dollar_1 interface{}) ([]*User, error)
 	GetPostByID(ctx context.Context, id int64) (*Post, error)
+	GetPostByUserID(ctx context.Context, userID string) ([]*Post, error)
 	GetUserByID(ctx context.Context, id string) (*User, error)
 }
 

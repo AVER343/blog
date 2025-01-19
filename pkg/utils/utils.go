@@ -3,16 +3,24 @@ package utils
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/go-playground/validator/v10"
 )
 
-func WriteJSON(w http.ResponseWriter, status int, data any) {
+var Validate *validator.Validate
+
+func init() {
+	Validate = validator.New(validator.WithRequiredStructEnabled(), validator.WithPrivateFieldValidation())
+}
+
+func WriteJSON(w http.ResponseWriter, status int, data any) error {
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(data); err != nil {
 		w.WriteHeader(500)
 		w.Write([]byte("Something went wrong"))
 	}
 	w.WriteHeader(status)
-
+	return nil
 }
 
 func ReadJSON(w http.ResponseWriter, r *http.Request, data any) error {
@@ -29,4 +37,11 @@ func WriteJSONError(w http.ResponseWriter, status int, message string) {
 	}
 	newError := data{Err: message}
 	WriteJSON(w, status, newError)
+}
+
+func JsonResponse(w http.ResponseWriter, status int, data any) error {
+	type envelope struct {
+		Data any `json:"data"`
+	}
+	return WriteJSON(w, status, &envelope{Data: data})
 }

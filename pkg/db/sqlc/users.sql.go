@@ -35,7 +35,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg *CreateUserParams) (*User,
 }
 
 const getAllUsers = `-- name: GetAllUsers :many
-SELECT id, username, password, email, created_at, updated_at FROM users LIMIT COALESCE($1,10)
+SELECT id, username, password, email, created_at, updated_at FROM users LIMIT COALESCE($1,1000)
 `
 
 func (q *Queries) GetAllUsers(ctx context.Context, dollar_1 interface{}) ([]*User, error) {

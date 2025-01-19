@@ -1,12 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/aver343/blog/pkg/config"
 	"github.com/aver343/blog/pkg/db"
 	"github.com/aver343/blog/pkg/db/repository"
+	"go.uber.org/zap"
 )
 
 func main() {
@@ -14,6 +14,8 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading env vars")
 	}
+	logger := zap.Must(zap.NewProduction()).Sugar()
+	defer logger.Sync()
 	dbConfig := *cfg.DbConfig
 	database, err := db.New(dbConfig.Addr,
 		dbConfig.MaxOpenConns,
@@ -25,9 +27,9 @@ func main() {
 
 	defer database.Close()
 	repo := repository.NewRepository(database)
-	app := NewApplication(cfg, repo)
+	app := NewApplication(cfg, repo, logger)
 
 	handler := app.Mount()
-	fmt.Printf("Server is running at %s !", app.Config.Addr)
+	app.Logger.Infof("Server is running at %s !", app.Config.Addr)
 	app.Run(handler)
 }

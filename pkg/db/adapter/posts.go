@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 
+	"github.com/aver343/blog/pkg/db/dto"
 	"github.com/aver343/blog/pkg/db/sqlc"
 	"github.com/aver343/blog/pkg/models"
 )
@@ -22,21 +22,19 @@ func NewSQLCPostRepository(queries *sqlc.Queries) *SQLCPostRepository {
 	return &SQLCPostRepository{query: queries}
 }
 
-func (p *SQLCPostRepository) Create(ctx context.Context, m *models.Post) error {
+func (p *SQLCPostRepository) Create(ctx context.Context, m *dto.CreatePostPayload) (*models.Post, error) {
 	postParam := &sqlc.CreatePostParams{
 		Title:   m.Title,
 		Content: m.Content,
 		UserID:  m.UserID,
 	}
 
-	savedPost, err := p.query.CreatePost(ctx, postParam)
+	dbPost, err := p.query.CreatePost(ctx, postParam)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	m.ID = savedPost.ID
-	m.CreatedAt = savedPost.CreatedAt.Time.String()
-	m.UpdatedAt = savedPost.UpdatedAt.Time.String()
-	return nil
+	post := models.NewPost(dbPost.ID, dbPost.Content, dbPost.Title, dbPost.UserID, dbPost.Tags)
+	return post, nil
 }
 
 func (p *SQLCPostRepository) GetPostByID(ctx context.Context, id int64) (*models.Post, error) {
@@ -49,7 +47,6 @@ func (p *SQLCPostRepository) GetPostByID(ctx context.Context, id int64) (*models
 		}
 		return nil, err
 	}
-	fmt.Print(post)
 	modelPost := models.NewPost(post.ID, post.Content, post.Title, post.UserID, nil)
 	return modelPost, nil
 }
@@ -60,7 +57,6 @@ func (p *SQLCPostRepository) PatchByID(ctx context.Context, id int64) (*models.P
 	if err != nil {
 		return nil, err
 	}
-	fmt.Print(post)
 	modelPost := models.NewPost(post.ID, post.Content, post.Title, post.UserID, nil)
 	return modelPost, nil
 }
@@ -68,6 +64,19 @@ func (p *SQLCPostRepository) PatchByID(ctx context.Context, id int64) (*models.P
 func (p *SQLCPostRepository) GetAllPosts(ctx context.Context) ([]*models.Post, error) {
 	var posts []*models.Post = make([]*models.Post, 0)
 	dbPosts, err := p.query.GetAllPosts(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+	for _, elem := range dbPosts {
+		post := models.NewPost(elem.ID, elem.Content, elem.Title, elem.UserID, elem.Tags)
+		posts = append(posts, post)
+	}
+	return posts, nil
+}
+
+func (p *SQLCPostRepository) GetPostByUserID(ctx context.Context, payload *dto.GetPostByUserIDPayload) ([]*models.Post, error) {
+	var posts []*models.Post = make([]*models.Post, 0)
+	dbPosts, err := p.query.GetPostByUserID(ctx, payload.UserID)
 	if err != nil {
 		return nil, err
 	}

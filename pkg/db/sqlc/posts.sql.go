@@ -38,7 +38,7 @@ func (q *Queries) CreatePost(ctx context.Context, arg *CreatePostParams) (*Post,
 }
 
 const getAllPosts = `-- name: GetAllPosts :many
-SELECT id, title, content, user_id, created_at, updated_at, tags FROM posts LIMIT COALESCE($1,10)
+SELECT id, title, content, user_id, created_at, updated_at, tags FROM posts LIMIT COALESCE($1,1000)
 `
 
 func (q *Queries) GetAllPosts(ctx context.Context, dollar_1 interface{}) ([]*Post, error) {
@@ -89,4 +89,39 @@ func (q *Queries) GetPostByID(ctx context.Context, id int64) (*Post, error) {
 		pq.Array(&i.Tags),
 	)
 	return &i, err
+}
+
+const getPostByUserID = `-- name: GetPostByUserID :many
+SELECT id, title, content, user_id, created_at, updated_at, tags FROM posts WHERE user_id=$1
+`
+
+func (q *Queries) GetPostByUserID(ctx context.Context, userID string) ([]*Post, error) {
+	rows, err := q.db.QueryContext(ctx, getPostByUserID, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*Post
+	for rows.Next() {
+		var i Post
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Content,
+			&i.UserID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			pq.Array(&i.Tags),
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

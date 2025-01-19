@@ -6,4 +6,4 @@ INSERT INTO users(email,username,password)
 SELECT * FROM users WHERE ID=$1;
 
 -- name: GetAllUsers :many
-SELECT * FROM users LIMIT COALESCE($1,10);
+SELECT * FROM users LIMIT COALESCE($1,1000);
